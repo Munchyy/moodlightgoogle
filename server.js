@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 const driver = require('rpi-ws281x-native');
-const debug = require('debug')('led-server');
+const colours = require('./colours.json');
 
 const NUMBER_OF_LEDS = 32;
 const port = 5000;
@@ -26,9 +26,22 @@ app.post('/display', (req, res) => {
   }
 });
 
+const getLeds = (colour) => {
+  const index = colours.findIndex(col => col.name.toLowerCase() === colour.toLowerCase())
+  if (index !== -1) {
+    return new Array(NUMBER_OF_LEDS).fill(parseInt(colours[index].hex, 16));
+  }
+  return new Array(NUMBER_OF_LEDS).fill(0);
+};
+
 app.post('/google', (req, res) => {
-  console.log(req.body);
-  res.status(200);
+  const colourCommand = req.body.colour;
+
+  console.log({colourCommand});
+  const leds = getLeds(colourCommand);
+  console.log(leds);
+  res.status(200).json({response: 'ok'});
+  driver.render(leds);
 });
 
 app.get('/clear', (req, res) => {
