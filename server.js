@@ -27,21 +27,28 @@ app.post('/display', (req, res) => {
 });
 
 const getLeds = (colour) => {
-  const index = colours.findIndex(col => col.name.toLowerCase() === colour.toLowerCase())
+  const colourInput = colour.split(' ').join('');
+  const index = colours.findIndex(col => col.name.toLowerCase() === colourInput.toLowerCase())
   if (index !== -1) {
     return new Array(NUMBER_OF_LEDS).fill(parseInt(colours[index].hex, 16));
   }
   return new Array(NUMBER_OF_LEDS).fill(0);
 };
 
+app.post('/googlebrightness', (req, res) => {
+  const brightness = +req.body.brightness;
+  console.log({brightness});
+  driver.setBrightness(brightness);
+  driver.render
+  res.status(200).json({ response: 'ok' });
+});
+
 app.post('/google', (req, res) => {
   const colourCommand = req.body.colour;
-
   console.log({colourCommand});
   const leds = getLeds(colourCommand);
-  console.log(leds);
-  res.status(200).json({response: 'ok'});
   driver.render(leds);
+  res.status(200).json({response: 'ok'});
 });
 
 app.get('/clear', (req, res) => {
@@ -59,4 +66,5 @@ let server = app.listen(port);
 console.log('initialising');
 driver.init(NUMBER_OF_LEDS);
 driver.setBrightness(5);
+driver.render(getLeds('red'));
 console.log('Server running on moodlight:' + port);
