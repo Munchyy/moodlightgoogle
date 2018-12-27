@@ -4,7 +4,7 @@ const driver = require('rpi-ws281x-native');
 const debug = require('debug')('led-server');
 
 const NUMBER_OF_LEDS = 32;
-const port = 3000;
+const port = 5000;
 
 let app = express();
 app.use(bodyparser.json());
@@ -26,6 +26,11 @@ app.post('/display', (req, res) => {
   }
 });
 
+app.post('/google', (req, res) => {
+  console.log(req.body);
+  res.status(200);
+});
+
 app.get('/clear', (req, res) => {
   console.log('get');
   const leds = [
@@ -37,8 +42,8 @@ app.get('/clear', (req, res) => {
   driver.render(leds);
   res.status(200).json({response: 'ok'});
 });
-let server = app.listen(3000);
+let server = app.listen(port);
 console.log('initialising');
 driver.init(NUMBER_OF_LEDS);
 driver.setBrightness(5);
-console.log('Server running on moodlight:3000');
+console.log('Server running on moodlight:' + port);
